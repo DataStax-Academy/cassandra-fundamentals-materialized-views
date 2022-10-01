@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Choosing consistency levels</div>
+<div class="step-title">Materialized view limitations</div>
 
 For critical transactions, you should prefer *strong consistency*, which guarantees that 
 all acknowledged writes are visible to subsequent reads. To achieve this, choose write and read consistency levels 

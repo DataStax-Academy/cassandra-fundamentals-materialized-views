@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Access and set a consistency level</div>
+<div class="step-title">Creating materialized view "users_by_date_joined"</div>
 
 The CQL shell has the `CONSISTENCY` command to both access and set a consistency level for 
 read and write operations. When you write your own application using a driver, there will be a way to 

@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">ONE, TWO, THREE, LOCAL_ONE</div>
+<div class="step-title">Creating materialized view "movies_by_genre_year"</div>
 
 Let's experiment with these consistency levels and see why 
 they can or cannot be satisfied.

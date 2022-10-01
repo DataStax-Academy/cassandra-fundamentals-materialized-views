@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Consistency levels</div>
+<div class="step-title">Syntax</div>
 
 Every write (`INSERT`, `UPDATE`, `DELETE`) or read (`SELECT`) operation in Cassandra is executed with a *consistency level* (CL), which 
 defines how many replicas that are writing or reading data must respond to a request coordinator 

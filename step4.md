@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Create a keyspace and a table</div>
+<div class="step-title">Creating materialized view "users_by_name"</div>
 
 To demonstrate how availability can be affected by different consistency levels, we can create 
 a keyspace that prescribes to have more replicas than the number of nodes in the cluster. Let's 

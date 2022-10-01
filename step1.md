@@ -20,27 +20,20 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Tunable consistency</div>
+<div class="step-title">Materialized views</div>
 
-Each keyspace in Cassandra has a data replication strategy, which prescribes 
-how data should be replicated. There usually exist 
-multiple copies of the same data stored on different nodes in a cluster.
-However, in the real world, nodes fail, go down, get replaced, go back up, become less responsive, 
-and so forth. While some replicas may become unavailable, other replicas may just be temporarily out-of-sync. Given such 
-conditions, will 
-your application still be able to access data? Can it tolerate the risk of reading inconsistent or stale data? 
- 
-The answer lies in *tunable consistency*. *Tunable consistency* is a mechanism that enables a per-operation tradeoff between *consistency* and 
-*availability*. For example, for some writes, your application may prefer higher consistency to make sure that
-a large number of replica nodes get those writes successfully. For some reads, your application may prefer higher availability allowing 
-the reads to be served by a small number of replicas making it possible to read even when many replicas are down. 
-We will soon demonstrate how consistency can be tuned using *consistency levels* and discuss how to choose consistency levels 
-to meet your use case requirements.
+Each table only supports a limited set of queries based on its primary key definition. 
+To support additional queries, the most generic and efficient solution is to duplicate the same data into 
+a new table with a different primary key. This process is frequently referred to as data *denormalization* and 
+data *duplication*. The drawback is that now you have to do multiple inserts, updates and deletes 
+to maintain the same data stored in multiple places. You may even need to use atomic batches in some cases. 
 
-Our introduction of tunable consistency would not be complete without mentioning *eventual consistency*, the term that refers to replicas becoming consistent or 
-synchronized over time. Since every column value has a write-time timestamp, it is straightforward to differentiate 
-between up-to-date and stale data. Cassandra provides several mechanisms to synchronize replicas, including *anti-entropy repair*, 
-*read repair* and *hinted handoff*. 
+To remove the burden of keeping multiple tables in sync from a developer, Cassandra supports 
+an experimental feature called *materialized views*. A *materialized view* is a read-only 
+table that automatically duplicates, persists and maintains a subset of data from a *base table*. Any change to data 
+in a base table is automatically propagated to every view associated with this table.   
+
+Materialized views are great for convenience but you should also be aware of their limitations, which we discuss later in this presentation.
 
 <!-- NAVIGATION -->
 <div id="navigation-bottom" class="navigation-bottom">

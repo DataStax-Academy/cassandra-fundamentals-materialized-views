@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">Find information about the cluster and start the CQL shell</div>
+<div class="step-title">Create a keyspace and tables</div>
 
 ✅ Use `nodetool` to find information about the cluster:
 ```

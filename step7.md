@@ -20,7 +20,7 @@
 
 <!-- CONTENT -->
 
-<div class="step-title">QUORUM, LOCAL_QUORUM, EACH_QUORUM</div>
+<div class="step-title">Creating materialized view "movies_by_genre_country"</div>
 
 Let's experiment with these consistency levels and see why 
 they can or cannot be satisfied.
