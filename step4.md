@@ -22,31 +22,38 @@
 
 <div class="step-title">Creating materialized view "users_by_name"</div>
 
-To demonstrate how availability can be affected by different consistency levels, we can create 
-a keyspace that prescribes to have more replicas than the number of nodes in the cluster. Let's 
-use replication factors `1` and `3` for *DC-London* and *DC-Paris*, respectively. You can think of this 
-situation as if we lost two replicas in *DC-Paris* due to a natural disaster ... will we still be able to write and read data?
+Our first task is to create a materialized view with name `users_by_name` that will allow retrieving 
+users based on their names like in this query:
 
-✅ Create the keyspace:
-```
-CREATE KEYSPACE IF NOT EXISTS ks_tunable_consistency
-WITH replication = {
-  'class': 'NetworkTopologyStrategy', 
-  'DC-London': 1,
-  'DC-Paris': 3 };
+<pre class="non-executable-code">
+SELECT * FROM users_by_name
+WHERE name = 'Joe';
+</pre>
 
-USE ks_tunable_consistency;
+We can use table `users` as a base table for the view.
+
+✅ Create the materialized view:
+```
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+users_by_name AS 
+  SELECT * FROM users
+  WHERE name IS NOT NULL AND email IS NOT NULL
+PRIMARY KEY ((name), email);
 ```
 
-✅ Create the table:
+✅ Retrieve users from the base table and materialized view:
 ```
-CREATE TABLE IF NOT EXISTS users (
-  email TEXT,
-  name TEXT,
-  age INT,
-  date_joined DATE,
-  PRIMARY KEY ((email))
-);
+SELECT * FROM users;
+SELECT * FROM users_by_name;
+```
+
+✅ Update a base table row and verify the effect on the materialized view:
+```
+UPDATE users SET name = 'Joseph' 
+WHERE email = 'joe@datastax.com';
+
+SELECT * FROM users WHERE email = 'joe@datastax.com';
+SELECT * FROM users_by_name WHERE name = 'Joseph';
 ```
 
 <!-- NAVIGATION -->

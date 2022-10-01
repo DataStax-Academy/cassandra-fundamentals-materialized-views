@@ -22,22 +22,59 @@
 
 <div class="step-title">Create a keyspace and tables</div>
 
-✅ Use `nodetool` to find information about the cluster:
-```
-docker exec -i -t Cassandra-1 bash -c 'nodetool status'
-```
-
-Notice that we have:
-- two nodes in the cluster
-- two datacenters named *DC-London* and *DC-Paris*
-- one node in each datacenter
-
 ✅ Start the CQL shell:
 ```
 cqlsh
 ```
 
-Notice that, in this example, `cqlsh` connects to the node in *DC-London* using default `localhost:9042`. The node in *DC-Paris* can be connected to by running command `cqlsh localhost 9043`.
+✅ Create the keyspace:
+```
+CREATE KEYSPACE killr_video
+WITH replication = {
+  'class': 'NetworkTopologyStrategy', 
+  'DC-Houston': 1 };
+```
+
+✅ Create and populate the tables:
+```
+USE killr_video;
+
+CREATE TABLE users (
+  email TEXT,
+  name TEXT,
+  age INT,
+  date_joined DATE,
+  PRIMARY KEY ((email))
+);
+INSERT INTO users (email, name, age, date_joined) 
+VALUES ('joe@datastax.com', 'Joe', 25, '2020-01-01');
+INSERT INTO users (email, name, age, date_joined) 
+VALUES ('jen@datastax.com', 'Jen', 27, '2020-01-01');
+INSERT INTO users (email, name, age, date_joined) 
+VALUES ('jim@datastax.com', 'Jim', 31, '2020-05-07');
+SELECT * FROM users;
+
+CREATE TABLE movies_by_genre (
+  genre TEXT,
+  title TEXT,
+  year INT,
+  duration INT,
+  avg_rating FLOAT,
+  country TEXT,
+  PRIMARY KEY ((genre), title, year)
+);
+INSERT INTO movies_by_genre (genre, title, year, duration, avg_rating, country) 
+VALUES ('Fantasy', 'Alice in Wonderland', 2010, 108, 8.33, 'USA');
+INSERT INTO movies_by_genre (genre, title, year, duration, avg_rating, country) 
+VALUES ('Adventure', 'Alice in Wonderland', 2010, 108, 8.33, 'USA');
+INSERT INTO movies_by_genre (genre, title, year, duration, avg_rating, country) 
+VALUES ('Adventure', 'The Extraordinary Adventures of Adele Blanc-Sec', 2010, 107, 6.30, 'France');
+INSERT INTO movies_by_genre (genre, title, year, duration, avg_rating, country) 
+VALUES ('Action', 'The Extraordinary Adventures of Adele Blanc-Sec', 2010, 107, 6.30, 'France');
+INSERT INTO movies_by_genre (genre, title, year, duration, avg_rating, country) 
+VALUES ('Adventure', 'How to Train Your Dragon', 2010, 98, 8.10, 'USA');
+SELECT * FROM movies_by_genre;
+```
 
 <!-- NAVIGATION -->
 <div id="navigation-bottom" class="navigation-bottom">

@@ -22,43 +22,60 @@
 
 <div class="step-title">Creating materialized view "movies_by_genre_country"</div>
 
-Let's experiment with these consistency levels and see why 
-they can or cannot be satisfied.
- 
-✅ Retrive a row using CL `QUORUM`:
-```
-CONSISTENCY QUORUM;
-SELECT * FROM users WHERE email = 'joe@datastax.com';
-```
+Finally, create materialized view `movies_by_genre_country` to be able to support the 
+following query:
 
-CL `QUORUM` could not be satisfied because the cluster does not have three (`(1 + 3) / 2 + 1`) replicas to respond.
+<pre class="non-executable-code">
+SELECT * FROM movies_by_genre_country
+WHERE genre = 'Adventure' 
+  AND country = 'USA'
+  AND year >=2010
+ORDER BY year DESC;
+</pre>
 
-
-✅ Retrive a row using CL `LOCAL_QUORUM`:
+✅ Create the materialized view:
 <details>
   <summary>Solution</summary>
 
 ```
-CONSISTENCY LOCAL_QUORUM;
-SELECT * FROM users WHERE email = 'joe@datastax.com';
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+movies_by_genre_country AS 
+  SELECT * FROM movies_by_genre
+  WHERE genre IS NOT NULL AND country IS NOT NULL
+    AND title IS NOT NULL AND year IS NOT NULL
+PRIMARY KEY ((genre, country), year, title)
+WITH CLUSTERING ORDER BY (year DESC, title ASC);
 ```
-
-CL `LOCAL_QUORUM` was satisfied by the only replica in local datacenter *DC-London*. One (`1 / 2 + 1`) response wa required.
 
 </details>
 
 <br/>
 
-✅ Retrive a row using CL `EACH_QUORUM`:
+✅ Retrieve movies from the base table and materialized view:
 <details>
   <summary>Solution</summary>
 
 ```
-CONSISTENCY EACH_QUORUM;
-SELECT * FROM users WHERE email = 'joe@datastax.com';
+SELECT * FROM movies_by_genre;
+SELECT * FROM movies_by_genre_country;
 ```
 
-CL `EACH_QUORUM` could not be satisfied because datacenter *DC-Paris* does not have two (`3 / 2 + 1`) replicas to respond.
+</details>
+
+<br/>
+
+✅ Delete the *Alice in Wonderland* movie from the base table:
+<details>
+  <summary>Solution</summary>
+
+```
+DELETE FROM movies_by_genre
+WHERE title = 'Alice in Wonderland' AND year = 2010
+  AND genre IN ('Fantasy','Adventure');
+
+SELECT * FROM movies_by_genre;
+SELECT * FROM movies_by_genre_country;
+```
 
 </details>
 

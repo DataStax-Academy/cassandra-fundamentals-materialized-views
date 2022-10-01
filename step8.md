@@ -22,23 +22,49 @@
 
 <div class="step-title">Materialized view limitations</div>
 
-For critical transactions, you should prefer *strong consistency*, which guarantees that 
-all acknowledged writes are visible to subsequent reads. To achieve this, choose write and read consistency levels 
-such that the write and read replica sets overlap. This simple inequality should be valid: 
+First and foremost, it is possible that a materialized view and a base table 
+become out-of-sync. Cassandra does not provide a way to automatically detect and fix such inconsistencies 
+other than dropping and recreating the materialized view, which is not an ideal solution in production: 
 
-`number_of_read_replicas + number_of_write_replicas > sum_of_replication_factors`
+```
+DROP MATERIALIZED VIEW users_by_name;
 
-If `QUORUM` is used for both reads and writes, you are guaranteed to have strong consistency. For example, 
-for our cluster with replication factors `1` and `3` for *DC-London* and *DC-Paris*, `QUORUM` means `(1 + 3) / 2 + 1 = 3` replicas and 
-the inequality holds `3 + 3 > 1 + 3`. In our cluster, we can similarly achieve strong consistency by using `QUORUM` for writes and `TWO` for reads.  
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+users_by_name AS 
+  SELECT * FROM users
+  WHERE name IS NOT NULL AND email IS NOT NULL
+PRIMARY KEY ((name), email);
+```
 
-With multiple datacenters, especially when datacenters serve different geographical locations, your application may prefer to only wait for responses 
-from replicas in a local datacenter to avoid potentially higher network latencies for replicas in remote datacenters. In this case, 
-`LOCAL_QUORUM` for both writes and reads can still guarantee strong consistency within the same datacenter, even though it 
-will be a weaker guarantee for applications accessing data in other datacenters. 
+To substantially lower the risk of base-view inconsistency, use consistency levels `LOCAL_QUORUM` and higher for 
+base table writes. In addition, standard recommended repair procedures should be performed on both tables and views regularly or 
+whenever a node is removed, replaced or started back up. 
 
-Finally, less critical transactions that do not require strong consistency 
-should prefer lower consistency levels, such as `ONE` and `LOCAL_ONE` to greatly improve response time, throughput and availability. 
+Second, in terms of performance, even though writes to base tables and views are asynchronous, 
+each materialized view slows down writes to its base table by approximately 10%. We recommend to not create more than two materialized views per table. 
+
+Finally, statement `CREATE MATERIALIZED VIEW` has restrictions on its query and primary key definitions that we previously discussed. In some cases, 
+it is simply impossible to use a materialized view, while a regular table is always an excellent option. Take a look at this example:
+
+
+```
+-- View returns an error
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+users_by_name_age AS 
+  SELECT * FROM users
+  WHERE name IS NOT NULL AND email IS NOT NULL
+    AND age  IS NOT NULL
+PRIMARY KEY ((name, age), email);
+
+-- Table works
+CREATE TABLE users_by_name_age (
+  email TEXT,
+  name TEXT,
+  age INT,
+  date_joined DATE,
+  PRIMARY KEY ((name, age), email)
+);
+```
 
 <!-- NAVIGATION -->
 <div id="navigation-bottom" class="navigation-bottom">

@@ -22,19 +22,55 @@
 
 <div class="step-title">Creating materialized view "users_by_date_joined"</div>
 
-The CQL shell has the `CONSISTENCY` command to both access and set a consistency level for 
-read and write operations. When you write your own application using a driver, there will be a way to 
-set a consistency level dynamically, too.
+Next, create materialized view `users_by_date_joined` to be able to retrieve 
+users based on their joining date. For example, the view should support the following query:
 
-✅ Get the current consistency level:
+<pre class="non-executable-code">
+SELECT * FROM users_by_date_joined
+WHERE date_joined = '2020-01-01';
+</pre>
+
+✅ Create the materialized view:
+<details>
+  <summary>Solution</summary>
+
 ```
-CONSISTENCY;
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+users_by_date_joined AS 
+  SELECT * FROM users
+  WHERE date_joined IS NOT NULL AND email IS NOT NULL
+PRIMARY KEY ((date_joined), email);
 ```
 
-✅ Set the consistency level:
+</details>
+
+<br/>
+
+✅ Retrieve users from the base table and materialized view:
+<details>
+  <summary>Solution</summary>
+
 ```
-CONSISTENCY LOCAL_ONE;
+SELECT * FROM users;
+SELECT * FROM users_by_date_joined;
 ```
+
+</details>
+
+<br/>
+
+✅ Delete one user from the base table:
+<details>
+  <summary>Solution</summary>
+
+```
+DELETE FROM users WHERE email = 'jim@datastax.com';
+
+SELECT * FROM users;
+SELECT * FROM users_by_date_joined;
+```
+
+</details>
 
 <!-- NAVIGATION -->
 <div id="navigation-bottom" class="navigation-bottom">

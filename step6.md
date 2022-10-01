@@ -22,69 +22,40 @@
 
 <div class="step-title">Creating materialized view "movies_by_genre_year"</div>
 
-Let's experiment with these consistency levels and see why 
-they can or cannot be satisfied.
- 
-✅ Add a row using CL `ONE`:
-```
-CONSISTENCY ONE;
-INSERT INTO users (email, name, age, date_joined) 
-VALUES ('joe@datastax.com', 'Joe', 25, '2020-01-01');
-```
-CL `ONE` was satisfied by one of the two nodes in the cluster.
+Our third task is to create a materialized view with name `movies_by_genre_year` that will allow retrieving 
+movies based on their genres and release years like in this query:
 
+<pre class="non-executable-code">
+SELECT * FROM movies_by_genre_year
+WHERE genre = 'Adventure' AND year = 2010;
+</pre>
 
-✅ Add a row using CL `TWO`:
-<details>
-  <summary>Solution</summary>
+We can use table `movies_by_genre` as a base table for the view.
 
+✅ Create the materialized view:
 ```
-CONSISTENCY TWO;
-INSERT INTO users (email, name, age, date_joined) 
-VALUES ('jen@datastax.com', 'Jen', 27, '2020-01-01');
+CREATE MATERIALIZED VIEW IF NOT EXISTS 
+movies_by_genre_year AS 
+  SELECT * FROM movies_by_genre
+  WHERE genre IS NOT NULL AND year IS NOT NULL
+    AND title IS NOT NULL
+PRIMARY KEY ((genre, year), title);
 ```
 
-CL `TWO` was satisfied by the two nodes in the cluster.
-
-</details>
-
-<br/>
-
-✅ Add a row using CL `THREE`:
-<details>
-  <summary>Solution</summary>
-
+✅ Retrieve movies from the base table and materialized view:
 ```
-CONSISTENCY THREE;
-INSERT INTO users (email, name, age, date_joined) 
-VALUES ('art@datastax.com', 'Art', 33, '2020-05-04');
+SELECT * FROM movies_by_genre;
+SELECT * FROM movies_by_genre_year;
 ```
 
-CL `THREE` could not be satisfied because the cluster does not have three replicas to respond.
-
-</details>
-
-<br/>
-
-✅ Add a row using CL `LOCAL_ONE`:
-<details>
-  <summary>Solution</summary>
-
+✅ Update the *Alice in Wonderland* movie average rating:
 ```
-CONSISTENCY LOCAL_ONE;
-INSERT INTO users (email, name, age, date_joined) 
-VALUES ('jim@datastax.com', 'Jim', 31, '2020-05-07');
-```
+UPDATE movies_by_genre SET avg_rating = 8.44 
+WHERE title = 'Alice in Wonderland' AND year = 2010
+  AND genre IN ('Fantasy','Adventure');
 
-CL `LOCAL_ONE` was satisfied by the node in our local datacenter *DC-London*.
-
-</details>
-
-<br/>
-
-✅ Retrieve all rows from the table:
-```
-CONSISTENCY ONE; SELECT * FROM users;
+SELECT * FROM movies_by_genre;
+SELECT * FROM movies_by_genre_year;
 ```
 
 <!-- NAVIGATION -->

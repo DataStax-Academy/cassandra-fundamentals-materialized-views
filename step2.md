@@ -22,28 +22,35 @@
 
 <div class="step-title">Syntax</div>
 
-Every write (`INSERT`, `UPDATE`, `DELETE`) or read (`SELECT`) operation in Cassandra is executed with a *consistency level* (CL), which 
-defines how many replicas that are writing or reading data must respond to a request coordinator 
-before the coordinator responds to the client. These are the consistency levels we use in our examples.
+To create a materialized view, Cassandra Query Language provides the `CREATE MATERIALIZED VIEW` statement with the following simplified syntax:
 
-| Consistency Level | Description |
-|------------------------|-------------|
-| `ONE`, `TWO`, `THREE`  | One, two and three replicas must respond, respectively |
-| `LOCAL_ONE`            | One replica in the local datacenter must respond | 
-| `QUORUM`               | A majority (n/2 + 1) of the replicas must respond |
-| `LOCAL_QUORUM`         | A majority (n/2 + 1) of the replicas in the local datacenter must respond |
-| `EACH_QUORUM`          | A majority (n/2 + 1) of the replicas in each datacenter must respond |
+<pre class="non-executable-code">
+CREATE MATERIALIZED VIEW [ IF NOT EXISTS ] 
+[keyspace_name.] view_name AS 
+  SELECT * | column_name [ , ... ]
+  FROM [keyspace_name.] base_table_name
+  WHERE primary_key_column_name IS NOT NULL [ AND ... ] 
+PRIMARY KEY ( 
+  ( partition_key_column_name  [ , ... ] )
+  [ clustering_key_column_name [ , ... ] ]
+)  
+[ WITH CLUSTERING ORDER BY 
+  ( clustering_key_column_name ASC|DESC [ , ... ] )
+];
+</pre>
 
-It is important to understand that write operations are always sent to all replicas. The write consistency level 
-only controls how many responses the request coordinator waits for before responding to the client.
-For read operations, the coordinator generally only issues read requests to enough replicas 
-to satisfy the read consistency level. However, if the selected replicas are slow to respond, the read request 
-may be forwarded to additional replicas.
+First, notice that a view is created within an existing keyspace. If a keyspace name is omitted, the current working keyspace is used.
 
-Finally, note that there are also CLs `ALL` and `ANY`, which represent the extreme cases. `ALL` requires all replicas to respond and 
-`ANY` can be used for writes when either one replica responds or zero replicas respond and the coordinator stores a hint. You should avoid using 
-these consistency levels in production. There are also CLs `SERIAL` and `LOCAL_SERIAL` that are used with lightweight transactions.
+Second, what gets persisted into a view is defined by a `SELECT` statement.
 
+Finally, a view primary key and an optional clustering order are defined simlarly to the respective `CREATE TABLE` definitions.
+
+Most importantly, the following restrictions apply to any materialized view definition:
+- A view and a base table must belong to the same keyspace;
+- No base table static column can be included in a view;
+- All base table primary key columns must become materialized view primary key columns;
+- At most one base table non-primary key column can become a materialized view primary key column;
+- All view primary key columns must be restricted to not allow nulls.
 
 <!-- NAVIGATION -->
 <div id="navigation-bottom" class="navigation-bottom">
