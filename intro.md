@@ -13,17 +13,17 @@
     <div class="container px-4 py-2">
      <div class="row g-4 py-2 row-cols-1 row-cols-lg-1">
       <div class="feature col div-choice">
-            <div class="scenario-description">Learn how to create a keyspace and select a data replication strategy for a Cassandra NoSQL database.</div>
+            <div class="scenario-description">Learn how and when to use materialized views in a Cassandra NoSQL database.</div>
             <ul>
-              <li><span class="scenario-description-attribute">Difficulty</span>: Beginner</li>
-              <li><span class="scenario-description-attribute">Time</span>: 15 minutes</li>
+              <li><span class="scenario-description-attribute">Difficulty</span>: Intermediate</li>
+              <li><span class="scenario-description-attribute">Time</span>: 20 minutes</li>
             </ul>
             <div class="scenario-objectives">In this hands-on lab, you will:</div>
             <ul>
-              <li><span class="scenario-objective">Learn about tunable consistency and consistency levels</span></li>
-              <li><span class="scenario-objective">Use the CQL shell <code>CONSISTENCY</code> command to get and set consistency levels</span></li>
-              <li><span class="scenario-objective">Experiment with consistency levels <code>ONE</code>, <code>TWO</code>, <code>THREE</code>, <code>LOCAL_ONE</code>, <code>QUORUM</code>, <code>LOCAL_QUORUM</code>, and <code>EACH_QUORUM</code></span></li>
-              <li><span class="scenario-objective">Understand how to choose appropriate consistency levels to meet your application requirements</span></li>
+              <li><span class="scenario-objective">Understand the purpose of materialized views</span></li>
+              <li><span class="scenario-objective">Use CQL statement <code>CREATE MATERIALIZED VIEW</code></span></li>
+              <li><span class="scenario-objective">Explore several examples of using materialized views</span></li>
+              <li><span class="scenario-objective">Learn about limitations of materialized views</span></li>
             </ul>
       </div>
      </div>

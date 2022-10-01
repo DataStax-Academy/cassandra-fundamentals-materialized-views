@@ -24,10 +24,10 @@
         <br/>
         <div class="scenario-objectives">In this hands-on lab, you learned about:</div>
         <ul>
-              <li><span class="scenario-objective">Tunable consistency and consistency levels</span></li>
-              <li><span class="scenario-objective">The CQL shell <code>CONSISTENCY</code> command</span></li>
-              <li><span class="scenario-objective">Consistency levels <code>ONE</code>, <code>TWO</code>, <code>THREE</code>, <code>LOCAL_ONE</code>, <code>QUORUM</code>, <code>LOCAL_QUORUM</code>, and <code>EACH_QUORUM</code></span></li>
-              <li><span class="scenario-objective">Choosing appropriate consistency levels to meet your application requirements</span></li>
+              <li><span class="scenario-objective">Materialized views</span></li>
+              <li><span class="scenario-objective">CQL statement <code>CREATE MATERIALIZED VIEW</code></span></li>
+              <li><span class="scenario-objective">Several examples of using materialized views</span></li>
+              <li><span class="scenario-objective">Limitations of materialized views</span></li>
         </ul>
         <div class="resources">Learn more about Cassandra on <a href="https://datastax.com/dev" target="_blank">datastax.com/dev</a>:</div>
         <ul>
