@@ -29,7 +29,7 @@ cqlsh
 
 ✅ Create the keyspace:
 ```
-CREATE KEYSPACE killr_video
+CREATE KEYSPACE ks_materialized_views
 WITH replication = {
   'class': 'NetworkTopologyStrategy', 
   'DC-Houston': 1 };
@@ -37,7 +37,7 @@ WITH replication = {
 
 ✅ Create and populate the tables:
 ```
-USE killr_video;
+USE ks_materialized_views;
 
 CREATE TABLE users (
   email TEXT,
